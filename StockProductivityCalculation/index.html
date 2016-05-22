@@ -7,15 +7,40 @@
 <body>
     <div id="main">
         <h1>Stock productivity calculator</h1>
-        <input type="button" value="Enter Stock Details" hash="calculate"/>
-        <input type="button" value="View Calculated Result" hash="view"/>
+        <input type="button" value="Enter Stock Details" hash="calculate" />
+        <input type="button" value="View Calculated Result" hash="view" />
     </div>
-    <div id="stockForm" style="display:none">
+    <div id="stockDetails" style="display:none">
         <h1>Enter stock details</h1>
+        <form id="stockDetailsForm" enctype="application/x-www-form-urlencoded">
+            <table>
+                <tr>
+                    <td>Stock name:</td>
+                    <td><input type="text" name="name" /></td>
+                </tr>
+                <tr>
+                    <td>Price:</td>
+                    <td><input type="text" name="price" /></td>
+                </tr>
+                <tr>
+                    <td>Quantity:</td>
+                    <td><input type="text" name="quantity" /></td>
+                </tr>
+                <tr>
+                    <td>Percentage:</td>
+                    <td><input type="text" name="percentage" /></td>
+                </tr>
+                <tr>
+                    <td>Years:</td>
+                    <td><input type="text" name="years" /></td>
+                </tr>
+                <tr><td id="errorMessage" colspan="2"></td></tr>
+            </table>
+        </form>
         <input id="calculate" type="button" value="View Calculated Result" />
     </div>
     <div id="view" style="display:none">
-        
+
     </div>
     <div></div>
     <div id="calculationDetails">
@@ -23,12 +48,41 @@
     </div>
     <input id="backToMain" type="button" value="Back to Main" />
     <script type="text/javascript">
+        $("#calculate").click(function () {
+            var jqxhr = $.post('stock/calculate', $('form#stockDetailsForm').serialize())
+                .done(function () {
+                    //todo: show calculation results after success
+                    $('#errorMessage').html('');
+                })
+                .fail(function (err) {
+                    var state = err.responseJSON.ModelState;
+                    var msg = GetErrorMessageFromJson(state);
+                    $('#errorMessage').html(msg);
+                });
+            return false;
+        });
+
+        function GetErrorMessageFromJson(state) {
+            var message = '';
+            for (var details in state) {
+                if (state.hasOwnProperty(details)) {
+                    var detailsErrors = state[details];
+                    for (var i = 0; i < detailsErrors.length; i++) {
+                        message = message + detailsErrors[i] + '<br />';
+                    }
+                }
+            }
+            return message;
+        }
+
         $(document).ready(function () {
             PrepareView();
-            $(":button").not("#calculate").click(function (event)
-            {
+            $(":button").not("#calculate").click(function (event) {
                 var hash = $(this).attr("hash");
-                var navigation = "/#" + hash;
+                var navigation = "/";
+                if (hash)
+                { navigation = "/#" + hash; }
+
                 window.location = navigation;
                 PrepareView();
             });
@@ -41,7 +95,7 @@
                 case "#view":
                     {
                         $("#main").hide();
-                        $("#stockForm").hide();
+                        $("#stockDetails").hide();
                         $("#viewShow").show();
                         $("#backToMain").show();
                     }
@@ -49,7 +103,7 @@
                 case "#calculate":
                     {
                         $("#main").hide();
-                        $("#stockForm").show();
+                        $("#stockDetails").show();
                         $("#viewShow").hide();
                         $("#backToMain").show();
                     }
@@ -57,7 +111,7 @@
                 default:
                     {
                         $("#main").show();
-                        $("#stockForm").hide();
+                        $("#stockDetails").hide();
                         $("#viewShow").hide();
                         $("#calculationDetails").hide();
                         $("#backToMain").hide();
