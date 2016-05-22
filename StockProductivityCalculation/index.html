@@ -49,10 +49,14 @@
     <input id="backToMain" type="button" value="Back to Main" />
     <script type="text/javascript">
         $("#calculate").click(function () {
-            var jqxhr = $.post('stock/calculate', $('form#stockDetailsForm').serialize())
+            var jqxhr = $.post('stock/calculate', $('#stockDetailsForm').serialize())
                 .done(function (response) {
                     //todo: show calculation results after success
                     $('#errorMessage').html('');
+                    $('#stockDetailsForm :input').prop('disabled', true);
+                    $('#calculate').prop('disabled', true);
+                    PopulateCalculationResults(response);
+                    
                 })
                 .fail(function (err) {
                     //TODO: check error code before the handle validation errors
@@ -62,6 +66,18 @@
                 });
             return false;
         });
+
+        function PopulateCalculationResults(result)
+        {
+            var html = '<table><tr><th>Year</th><th>Value</th></tr>';
+            for(var i = 0; i < result.length; i++)
+            {
+                html = html + 
+                '<tr><td>' + i + '</td><td>'+result[i].toFixed(2)+'</td></tr>';
+            }
+            html = html + '</table>';
+            $('#calculationDetails').html(html);
+        }
 
         function GetErrorMessageFromJson(state) {
             var message = '';
@@ -100,6 +116,8 @@
                         $("#stockDetails").hide();
                         $("#viewShow").show();
                         $("#backToMain").show();
+                        $("#calculationDetails").html('');
+
                     }
                     break;
                 case "#calculate":
@@ -108,6 +126,11 @@
                         $("#stockDetails").show();
                         $("#viewShow").hide();
                         $("#backToMain").show();
+                        $("#calculationDetails").html('');
+                        $("#calculationDetails").show();
+                        $('#stockDetailsForm :input').prop('disabled', false);
+                        $('#calculate').prop('disabled', false);
+
                     }
                     break;
                 default:
