@@ -2,10 +2,68 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Stock productivity calculator</title>
+    <script src="Scripts/jquery-2.2.3.min.js"></script>
 </head>
 <body>
-    <h1>Stock productivity calculator</h1>
-    <input type="button" value="Enter Stock Details" />
-    <input type="button" value="View Calculated Result" />
- </body>
+    <div id="main">
+        <h1>Stock productivity calculator</h1>
+        <input type="button" value="Enter Stock Details" hash="calculate"/>
+        <input type="button" value="View Calculated Result" hash="view"/>
+    </div>
+    <div id="stockForm" style="display:none">
+        <h1>Enter stock details</h1>
+        <input id="calculate" type="button" value="View Calculated Result" />
+    </div>
+    <div id="view" style="display:none">
+        
+    </div>
+    <div></div>
+    <div id="calculationDetails">
+
+    </div>
+    <input id="backToMain" type="button" value="Back to Main" />
+    <script type="text/javascript">
+        $(document).ready(function () {
+            PrepareView();
+            $(":button").not("#calculate").click(function (event)
+            {
+                var hash = $(this).attr("hash");
+                var navigation = "/#" + hash;
+                window.location = navigation;
+                PrepareView();
+            });
+        });
+
+
+        function PrepareView() {
+            hash = location.hash;
+            switch (hash) {
+                case "#view":
+                    {
+                        $("#main").hide();
+                        $("#stockForm").hide();
+                        $("#viewShow").show();
+                        $("#backToMain").show();
+                    }
+                    break;
+                case "#calculate":
+                    {
+                        $("#main").hide();
+                        $("#stockForm").show();
+                        $("#viewShow").hide();
+                        $("#backToMain").show();
+                    }
+                    break;
+                default:
+                    {
+                        $("#main").show();
+                        $("#stockForm").hide();
+                        $("#viewShow").hide();
+                        $("#calculationDetails").hide();
+                        $("#backToMain").hide();
+                    }
+            }
+        }
+    </script>
+</body>
 </html>
