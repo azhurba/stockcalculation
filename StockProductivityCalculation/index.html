@@ -3,12 +3,27 @@
 <head>
     <title>Stock productivity calculator</title>
     <script src="Scripts/jquery-2.2.3.min.js"></script>
+    <style>
+        .hidden
+        {
+            display: none;
+        }
+
+        #view table, #calculationDetails table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        #view td, #view th, #calculationDetails td, #calculationDetails th {
+            border: 1px solid black;
+            padding: 3px;
+        }        
+    </style>
 </head>
 <body>
     <div id="main">
         <h1>Stock productivity calculator</h1>
-        <input type="button" value="Enter Stock Details" hash="calculate" />
-        <input type="button" value="View Calculated Result" hash="view" />
+        <input type="button" value="Enter Stock Details" name="calculate" />
+        <input type="button" value="View Calculated Result" name="view" />
     </div>
     <div id="stockDetails" style="display:none">
         <h1>Enter stock details</h1>
@@ -42,7 +57,6 @@
     <div id="view" style="display:none">
 
     </div>
-    <div></div>
     <div id="calculationDetails">
 
     </div>
@@ -96,7 +110,7 @@
         $(document).ready(function () {
             PrepareView();
             $(":button").not("#calculate").click(function (event) {
-                var hash = $(this).attr("hash");
+                var hash = $(this).attr("name");
                 var navigation = "/";
                 if (hash)
                 { navigation = "/#" + hash; }
@@ -106,6 +120,48 @@
             });
         });
 
+        //Get request from server side for available saved calculations
+        function GetAllCalculations()
+        {
+            $.getJSON('stock/getAllCalculations')
+                .done(function (response) {
+                    PopulateListOfCalculations(response);
+                });
+        }
+
+        var calculationResults;
+        
+        function PopulateListOfCalculations(response)
+        {
+            calculationResults = response;
+            var layout = '<table><thead><tr><th>Name</th><th>Price</th><th>Quantity</th><th>Percentage</th><th>Years</th><th class="hidden"></th></tr><thead>';
+            if (!response || response.length == 0) {
+                layout = layout + '<tr><td colspan="5" align="center">No Data</td></tr>'
+            }
+            else
+            {
+                for (var i = 0; i < response.length; i++)
+                {
+                    layout = layout + '<tbody><tr>'
+                    + '<td>' + response[i].Details.Name + '</td>'
+                    + '<td>' + response[i].Details.Price  + '</td>'
+                    + '<td>' + response[i].Details.Quantity  + '</td>'
+                    + '<td>' + response[i].Details.Percentage  + '</td>'
+                    + '<td>' + response[i].Details.Years  + '</td>'
+                    + '<td class="hidden">' + i + '</td>'
+                    + '</tr></tbody>';
+                }
+            }
+
+            layout = layout + '</table>'
+            $('#view').html(layout);
+            $('#view>table>tbody>tr').click(function () {
+                $('#view>table>tbody>tr').css("background-color", "transparent");
+                $(this).css("background-color", "grey");
+                var index = parseInt($(this).contents("td:last").html(), 10);
+                PopulateCalculationResults(calculationResults[index].CalculationResults);
+            });
+        }
 
         function PrepareView() {
             hash = location.hash;
@@ -114,17 +170,17 @@
                     {
                         $("#main").hide();
                         $("#stockDetails").hide();
-                        $("#viewShow").show();
+                        $("#view").show();
                         $("#backToMain").show();
                         $("#calculationDetails").html('');
-
+                        GetAllCalculations();
                     }
                     break;
                 case "#calculate":
                     {
                         $("#main").hide();
                         $("#stockDetails").show();
-                        $("#viewShow").hide();
+                        $("#view").hide();
                         $("#backToMain").show();
                         $("#calculationDetails").html('');
                         $("#calculationDetails").show();
@@ -137,7 +193,7 @@
                     {
                         $("#main").show();
                         $("#stockDetails").hide();
-                        $("#viewShow").hide();
+                        $("#view").hide();
                         $("#calculationDetails").hide();
                         $("#backToMain").hide();
                     }

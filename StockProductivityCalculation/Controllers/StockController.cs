@@ -1,8 +1,10 @@
 ﻿using StockProductivityCalculation.Models;
 using System.Collections;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using System.Linq;
 
 namespace StockProductivityCalculation.Controllers
 {
@@ -25,6 +27,14 @@ namespace StockProductivityCalculation.Controllers
             var repository = new StockHttpApplicationRepository(HttpContext.Current.Application);
             repository.Add(new StockCalculationResult(details, result));
             return Request.CreateResponse(System.Net.HttpStatusCode.OK, result);
+        }
+
+        [HttpGet]
+        public List<StockCalculationResult> GetAllCalculations()
+        {
+            var repository = new StockHttpApplicationRepository(HttpContext.Current.Application);
+            var result = repository.GetAll();
+            return result == null ? null : result.ToList();
         }
     }
 }
