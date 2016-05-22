@@ -23,6 +23,9 @@ namespace StockProductivityCalculation.Controllers
                 return Request.CreateErrorResponse(System.Net.HttpStatusCode.BadRequest,
                     ModelState);
             }
+            //Need to encode string before save
+            details.Name = HttpUtility.HtmlEncode(details.Name);
+            
             var result = StockCalculator.Calculate(new StockData(details));
             var repository = new StockHttpApplicationRepository(HttpContext.Current.Application);
             repository.Add(new StockCalculationResult(details, result));

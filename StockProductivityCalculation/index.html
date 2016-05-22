@@ -12,6 +12,7 @@
         #view table, #calculationDetails table {
             border-collapse: collapse;
             width: 100%;
+            margin: 10px 0 10px;
         }
         #view td, #view th, #calculationDetails td, #calculationDetails th {
             border: 1px solid black;
@@ -55,7 +56,8 @@
         <input id="calculate" type="button" value="View Calculated Result" />
     </div>
     <div id="view" style="display:none">
-
+        <h1>Stock Productivity Result</h1>
+        <div></div>
     </div>
     <div id="calculationDetails">
 
@@ -68,9 +70,9 @@
                     //todo: show calculation results after success
                     $('#errorMessage').html('');
                     $('#stockDetailsForm :input').prop('disabled', true);
-                    $('#calculate').prop('disabled', true);
+                    $('#calculate').hide();
                     PopulateCalculationResults(response);
-                    
+                    $("#stockDetails h1").html("Calculation result");
                 })
                 .fail(function (err) {
                     //TODO: check error code before the handle validation errors
@@ -154,9 +156,9 @@
             }
 
             layout = layout + '</table>'
-            $('#view').html(layout);
-            $('#view>table>tbody>tr').click(function () {
-                $('#view>table>tbody>tr').css("background-color", "transparent");
+            $('#view>div').html(layout);
+            $('#view table>tbody>tr').click(function () {
+                $('#view table>tbody>tr').css("background-color", "transparent");
                 $(this).css("background-color", "grey");
                 var index = parseInt($(this).contents("td:last").html(), 10);
                 PopulateCalculationResults(calculationResults[index].CalculationResults);
@@ -185,8 +187,8 @@
                         $("#calculationDetails").html('');
                         $("#calculationDetails").show();
                         $('#stockDetailsForm :input').prop('disabled', false);
-                        $('#calculate').prop('disabled', false);
-
+                        $('#calculate').show();
+                        $("#stockDetails h1").html("Enter stock details");
                     }
                     break;
                 default:
