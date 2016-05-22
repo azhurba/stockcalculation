@@ -50,20 +50,22 @@
     <script type="text/javascript">
         $("#calculate").click(function () {
             var jqxhr = $.post('stock/calculate', $('form#stockDetailsForm').serialize())
-                .done(function () {
+                .done(function (response) {
                     //todo: show calculation results after success
                     $('#errorMessage').html('');
                 })
                 .fail(function (err) {
+                    //TODO: check error code before the handle validation errors
                     var state = err.responseJSON.ModelState;
                     var msg = GetErrorMessageFromJson(state);
-                    $('#errorMessage').html(msg);
+                    $('#errorMessage').html(msg).css("color", "red");
                 });
             return false;
         });
 
         function GetErrorMessageFromJson(state) {
             var message = '';
+            //iterate through own properties of HSON object and get an error message from the inner collection of each property
             for (var details in state) {
                 if (state.hasOwnProperty(details)) {
                     var detailsErrors = state[details];

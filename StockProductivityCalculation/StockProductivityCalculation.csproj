@@ -89,6 +89,7 @@
     </Compile>
     <Compile Include="Models\StockDetails.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StockCalculator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
